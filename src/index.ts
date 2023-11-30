@@ -7,8 +7,8 @@ const MY_DOMAIN = 'notion.knowledgedump.space';
 
 async function fetchAllNotionRecords() {
   console.log('fetchign records')
-  const api_key = "secret_eR4tFTbg7JicddiQykrLsuQsGhTJpwPkdpl90jlrfhD";
-  const database_id = "e05da5d0a6444566a167aff89c2ffff9";
+  const api_key = NOTION_API_KEY
+  const database_id = NOTION_BLOG_DB;
 
   // Define request headers
   const headers = {

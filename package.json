@@ -2,6 +2,7 @@
   "name": "notion-blog-interceptor-xray12",
   "version": "0.0.0",
   "private": true,
+  "main": "src/index.ts",
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
