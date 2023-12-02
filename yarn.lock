@@ -589,6 +589,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"env2json@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "env2json@npm:1.1.0"
+  dependencies:
+    minimist: ^1.2.0
+  bin:
+    env2json: ./bin/env2json
+  checksum: b22b44a04cedc05c36677c7f3f968deec57a865c6128b30c6fd5e496c7a04b3048cd5ef876252fe7c2d0d545a089f53e3aaa10189b47010d0451fe5e51047ebc
+  languageName: node
+  linkType: hard
+
 "err-code@npm:^2.0.2":
   version: 2.0.3
   resolution: "err-code@npm:2.0.3"
@@ -1019,6 +1030,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"minimist@npm:^1.2.0":
+  version: 1.2.8
+  resolution: "minimist@npm:1.2.8"
+  checksum: 75a6d645fb122dad29c06a7597bddea977258957ed88d7a6df59b5cd3fe4a527e253e9bbf2e783e4b73657f9098b96a5fe96ab8a113655d4109108577ecf85b0
+  languageName: node
+  linkType: hard
+
 "minipass-collect@npm:^2.0.1":
   version: 2.0.1
   resolution: "minipass-collect@npm:2.0.1"
@@ -1194,6 +1212,7 @@ __metadata:
   resolution: "notion-blog-interceptor-xray12@workspace:."
   dependencies:
     "@cloudflare/workers-types": ^4.20230419.0
+    env2json: ^1.1.0
     typescript: ^5.0.4
     wrangler: ^3.0.0
   languageName: unknown

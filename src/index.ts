@@ -5,67 +5,18 @@
 const MY_DOMAIN = 'notion.knowledgedump.space';
 
 
-async function fetchAllNotionRecords() {
-  console.log('fetchign records')
-  const api_key = NOTION_API_KEY
-  const database_id = NOTION_BLOG_DB;
-
-  // Define request headers
-  const headers = {
-      'Authorization': `Bearer ${api_key}`,
-      'Notion-Version': '2021-08-16',
-      'Content-Type': 'application/json',
-  };
-
-  // Initialize records to store all results
-  const records = [];
-
-  let hasMore = true;
-  let startCursor = null;
-
-  while (hasMore) {
-      const requestBody = {
-          start_cursor: startCursor,
-      };
-
-      const response = await fetch(`https://api.notion.com/v1/databases/${database_id}/query`, {
-          method: 'POST',
-          headers: headers,
-          body: JSON.stringify(requestBody),
-      });
-
-      console.log(response)
-
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      records.push(...data.results);
-
-      hasMore = data.has_more;
-      startCursor = data.next_cursor;
-  }
-
-  // Return all records
-  return records;
-}
-
-fetchAllNotionRecords().then(records => {
-  console.log("records", records);
-});
-
-
-
 /*
   * Step 2: enter your URL slug to page ID mapping
   * The key on the left is the slug (without the slash)
   * The value on the right is the Notion page ID
   */
 //  TODO Store this elsewhere.... should be able to query notion for
-const SLUG_TO_PAGE = {
-  '': 'f63f6cb1b2004ec99d230b117eeabbbd',
-  'DJ-4P': 'fd56c294fe664c168988ea1912846a7b'
+interface StringMap {
+  [key: string]: string;
+}
+
+const SLUG_TO_PAGE: StringMap = {
+  '': 'ea829bdb5dff4e3e95327c6cdceec773'
 };
 
 /* Step 3: enter your page title and description for SEO purposes */
@@ -91,8 +42,8 @@ const CUSTOM_SCRIPT = `
 
 /* CONFIGURATION ENDS HERE */
 
-const PAGE_TO_SLUG = {};
-const slugs = [];
+const PAGE_TO_SLUG: StringMap = {};
+const slugs: string[] = [];
 const pages = [];
 Object.keys(SLUG_TO_PAGE).forEach(slug => {
   const page = SLUG_TO_PAGE[slug];
@@ -100,6 +51,7 @@ Object.keys(SLUG_TO_PAGE).forEach(slug => {
   pages.push(page);
   PAGE_TO_SLUG[page] = slug;
 });
+
 
 addEventListener('fetch', event => {
   event.respondWith(fetchAndApply(event.request));
@@ -122,7 +74,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-function handleOptions(request) {
+function handleOptions(request: Request) {
   if (request.headers.get('Origin') !== null &&
     request.headers.get('Access-Control-Request-Method') !== null &&
     request.headers.get('Access-Control-Request-Headers') !== null) {
@@ -140,7 +92,7 @@ function handleOptions(request) {
   }
 }
 
-function rewriteHostName(hostname) {
+function rewriteHostName(hostname: string) {
   if (hostname.startsWith("exp.")) {
     return hostname.replace(MY_DOMAIN, 'notion.so');
   }
@@ -148,7 +100,7 @@ function rewriteHostName(hostname) {
   return 'www.notion.so';
 }
 
-async function fetchAndApply(request) {
+async function fetchAndApply(request: Request) {
   if (request.method === 'OPTIONS') {
     return handleOptions(request);
   }
@@ -209,7 +161,7 @@ async function fetchAndApply(request) {
 }
 
 class MetaRewriter {
-  element(element) {
+  element(element: Element) {
     if (PAGE_TITLE !== '') {
       if (element.getAttribute('property') === 'og:title'
         || element.getAttribute('name') === 'twitter:title') {
@@ -237,8 +189,8 @@ class MetaRewriter {
 }
 
 class HeadRewriter {
-element(element) {
-  if (GOOGLE_FONT !== '') {
+element(element: Element) {
+  if (GOOGLE_FONT !== "") {
     element.append(
       `<link href='https://fonts.googleapis.com/css?family=${GOOGLE_FONT.replace(
         ' ',
@@ -260,11 +212,14 @@ element(element) {
 }
 
 class BodyRewriter {
-  constructor(SLUG_TO_PAGE) {
-    this.SLUG_TO_PAGE = SLUG_TO_PAGE;
+  SLUG_TO_PAGE: StringMap;
+
+  constructor(SLUG_TO_PAGE: StringMap) {
+    this.SLUG_TO_PAGE  = SLUG_TO_PAGE;
   }
-  element(element) {
-    element.append(`<div style="display:none">Powered by <a href="http://fruitionsite.com">Fruition</a></div>
+
+  element(element: Element) {
+    element.append(`
     <script>
     window.CONFIG.domainBaseUrl = 'https://${MY_DOMAIN}';
     localStorage.__console = true;
@@ -274,24 +229,29 @@ class BodyRewriter {
     const pages = [];
     const el = document.createElement('div');
     let redirected = false;
+    
     Object.keys(SLUG_TO_PAGE).forEach(slug => {
       const page = SLUG_TO_PAGE[slug];
       slugs.push(slug);
       pages.push(page);
       PAGE_TO_SLUG[page] = slug;
     });
+
     function getPage() {
       return location.pathname.slice(-32);
     }
+
     function getSlug() {
       return location.pathname.slice(1);
     }
+
     function updateSlug() {
       const slug = PAGE_TO_SLUG[getPage()];
       if (slug != null) {
         history.replaceState(history.state, '', '/' + slug);
       }
     }
+
     function enableConsoleEffectAndSetMode(mode){
       if (__console && !__console.isEnabled) {
         __console.enable();
@@ -301,16 +261,19 @@ class BodyRewriter {
         localStorage.setItem('newTheme', JSON.stringify({ mode: mode }));
       }
     }
+
     function onDark() {
       el.innerHTML = '<div title="Change to Light Mode" style="margin-left: 14px; margin-right: 14px; min-width: 0px;"><div role="button" tabindex="0" style="user-select: none; transition: background 120ms ease-in 0s; cursor: pointer; border-radius: 44px;"><div style="display: flex; flex-shrink: 0; height: 14px; width: 26px; border-radius: 44px; padding: 2px; box-sizing: content-box; background: rgb(46, 170, 220); transition: background 200ms ease 0s, box-shadow 200ms ease 0s;"><div style="width: 14px; height: 14px; border-radius: 44px; background: white; transition: transform 200ms ease-out 0s, background 200ms ease-out 0s; transform: translateX(12px) translateY(0px);"></div></div></div></div>';
       document.body.classList.add('dark');
       enableConsoleEffectAndSetMode('dark')
     }
+
     function onLight() {
       el.innerHTML = '<div title="Change to Dark Mode" style="margin-left: 14px; margin-right: 14px; min-width: 0px;"><div role="button" tabindex="0" style="user-select: none; transition: background 120ms ease-in 0s; cursor: pointer; border-radius: 44px;"><div style="display: flex; flex-shrink: 0; height: 14px; width: 26px; border-radius: 44px; padding: 2px; box-sizing: content-box; background: rgba(135, 131, 120, 0.3); transition: background 200ms ease 0s, box-shadow 200ms ease 0s;"><div style="width: 14px; height: 14px; border-radius: 44px; background: white; transition: transform 200ms ease-out 0s, background 200ms ease-out 0s; transform: translateX(0px) translateY(0px);"></div></div></div></div>';
       document.body.classList.remove('dark');
       enableConsoleEffectAndSetMode('light')
     }
+
     function toggle() {
       if (document.body.classList.contains('dark')) {
         onLight();
@@ -318,6 +281,7 @@ class BodyRewriter {
         onDark();
       }
     }
+
     function addDarkModeButton(device) {
       const nav =
         device === 'web'
@@ -350,6 +314,7 @@ class BodyRewriter {
         toggle()
       })
     }
+
     const observer = new MutationObserver(function() {
       if (redirected) return;
       const nav = document.querySelector('.notion-topbar');
@@ -372,15 +337,18 @@ class BodyRewriter {
         };
       }
     });
+
     observer.observe(document.querySelector('#notion-app'), {
       childList: true,
       subtree: true,
     });
+
     const replaceState = window.history.replaceState;
     window.history.replaceState = function(state) {
       if (arguments[1] !== 'bypass' && slugs.includes(getSlug())) return;
       return replaceState.apply(window.history, arguments);
     };
+
     const pushState = window.history.pushState;
     window.history.pushState = function(state) {
       const dest = new URL(location.protocol + location.host + arguments[2]);
@@ -390,6 +358,7 @@ class BodyRewriter {
       }
       return pushState.apply(window.history, arguments);
     };
+
     const open = window.XMLHttpRequest.prototype.open;
     window.XMLHttpRequest.prototype.open = function() {
       arguments[1] = arguments[1].replace('${MY_DOMAIN}', 'www.notion.so');
@@ -401,7 +370,7 @@ class BodyRewriter {
   }
 }
 
-async function appendJavascript(res, SLUG_TO_PAGE) {
+async function appendJavascript(res: Response, SLUG_TO_PAGE: StringMap) {
   return new HTMLRewriter()
     .on('title', new MetaRewriter())
     .on('meta', new MetaRewriter())
