@@ -1,7 +1,7 @@
 
 
 async function fetchAllNotionRecords() {
-  console.log('fetchign records')
+  console.log('fetching records')
   const api_key = NOTION_API_KEY
   const database_id = NOTION_BLOG_DB;
 

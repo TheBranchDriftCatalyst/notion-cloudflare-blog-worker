@@ -171,12 +171,10 @@ class MetaRewriter {
         element.setInnerContent(PAGE_TITLE);
       }
     }
-    if (PAGE_DESCRIPTION !== '') {
-      if (element.getAttribute('name') === 'description'
-        || element.getAttribute('property') === 'og:description'
-        || element.getAttribute('name') === 'twitter:description') {
-        element.setAttribute('content', PAGE_DESCRIPTION);
-      }
+    if (PAGE_DESCRIPTION !== '' && (element.getAttribute('name') === 'description'
+            || element.getAttribute('property') === 'og:description'
+            || element.getAttribute('name') === 'twitter:description')) {
+          element.setAttribute('content', PAGE_DESCRIPTION);
     }
     if (element.getAttribute('property') === 'og:url'
       || element.getAttribute('name') === 'twitter:url') {
@@ -215,7 +213,7 @@ class BodyRewriter {
   SLUG_TO_PAGE: StringMap;
 
   constructor(SLUG_TO_PAGE: StringMap) {
-    this.SLUG_TO_PAGE  = SLUG_TO_PAGE;
+    this.SLUG_TO_PAGE = SLUG_TO_PAGE;
   }
 
   element(element: Element) {
@@ -276,8 +274,10 @@ class BodyRewriter {
 
     function toggle() {
       if (document.body.classList.contains('dark')) {
+        console.log("panda panda")
         onLight();
       } else {
+        console.log("panda panda")
         onDark();
       }
     }
